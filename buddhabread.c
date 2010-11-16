@@ -129,8 +129,8 @@ int main(int argc, char **argv)
         }
     }
 
-    seconds = difftime(start, time(NULL));
-    printf("Processing completed in %f\nSaving raw\n", seconds);
+    seconds = difftime(time(NULL), start);
+    printf("Processing completed in %.0fs\nSaving raw\n", seconds);
 
     save(counters, width, height);
 
