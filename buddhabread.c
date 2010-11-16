@@ -10,6 +10,8 @@
 #include <math.h>
 #include <time.h>
 
+const int SAMPLES_PER_PIXEL = 4;
+
 typedef struct complex
 {
     double re;
@@ -37,7 +39,7 @@ double length(complex a)
     return sqrt(a.re * a.re + a.im * a.im);
 }
 
-void save(int *counters, int width, int height)
+void save(unsigned int *counters, int width, int height)
 {
     FILE *out;
     int i, j;
@@ -73,10 +75,11 @@ int main(int argc, char **argv)
 {
     int width, height, maxIterations;
     int a, b;
-    int x, y;
+    double x, y;
+    double step = 1.0 / sqrt(SAMPLES_PER_PIXEL);
     int x1, y1;
-    int bufferSize;
-    int *counters;
+    unsigned int bufferSize;
+    unsigned int *counters;
     complex z, c;
     complex *history;
     time_t start;
@@ -97,10 +100,10 @@ int main(int argc, char **argv)
 
     start = time(NULL);
 
-    for (x = 0; x < width; x ++)
+    for (x = 0; x < width; x += step)
     {
         printf(".");
-        for (y = 0; y < height; y ++)
+        for (y = 0; y < height; y += step)
         {
             c.re = (x * 3.0 / width - 2);
             c.im = (y * 3.0 / height - 1.5);
@@ -130,7 +133,7 @@ int main(int argc, char **argv)
     }
 
     seconds = difftime(time(NULL), start);
-    printf("Processing completed in %.0fs\nSaving raw\n", seconds);
+    printf("\nProcessing completed in %.0fs\nSaving raw\n", seconds);
 
     save(counters, width, height);
 
