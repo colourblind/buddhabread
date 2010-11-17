@@ -10,8 +10,6 @@
 #include <math.h>
 #include <time.h>
 
-const int SAMPLES_PER_PIXEL = 4;
-
 typedef struct complex
 {
     double re;
@@ -73,10 +71,11 @@ void save(unsigned int *counters, int width, int height)
 
 int main(int argc, char **argv)
 {
-    int width, height, maxIterations;
+    int width = 600, height = 600;
+    int maxIterations = 500;
+    double step = 1;
     int a, b;
     double x, y;
-    double step = 1.0 / sqrt(SAMPLES_PER_PIXEL);
     int x1, y1;
     unsigned int bufferSize;
     unsigned int *counters;
@@ -85,12 +84,12 @@ int main(int argc, char **argv)
     time_t start;
     double seconds;
 
-    if (argc < 4)
-        return 1;
-
-    width = atoi(argv[1]);
-    height = atoi(argv[2]);
-    maxIterations = atoi(argv[3]);
+    if (argc > 1)
+        width = height = atoi(argv[1]);
+    if (argc > 2)
+        maxIterations = atoi(argv[2]);
+    if (argc > 3)
+        step =  1.0 / sqrt(atoi(argv[3]));
 
     bufferSize = sizeof(int) * width * height;
     counters = malloc(bufferSize);
