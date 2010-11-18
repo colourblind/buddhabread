@@ -10,6 +10,8 @@
 #include <math.h>
 #include <time.h>
 
+int save_png(char *filename, char *data, int width, int height);
+
 typedef struct complex
 {
     double re;
@@ -37,15 +39,14 @@ double length(complex a)
     return sqrt(a.re * a.re + a.im * a.im);
 }
 
-void save(unsigned int *counters, int width, int height)
+void save(unsigned int *counters, int width, int height, char *filename)
 {
-    FILE *out;
     int i, j;
     double colour;
-    unsigned char c;
     unsigned int total = 0;
     double luminosity;
     unsigned int maxCount = 0;
+    unsigned char *data;
 
     for (i = 0; i < width * height; i ++)
     {
@@ -56,24 +57,26 @@ void save(unsigned int *counters, int width, int height)
 
     printf("\nTotal: %d\nMax  : %d\nLumin: %f\n", total, maxCount, luminosity);
 
-    out = fopen("out.raw", "wb");
+    data = malloc(width * height);
     for (i = 0; i < height; i ++)
     {
         for (j = 0; j < width; j ++)
         {
             colour = (counters[j * width + i] / (luminosity * 10)) * 255.0;
-            c = (unsigned char)(colour > 255 ? 255 : colour);
-            fwrite(&c, 1, 1, out);
+            data[i * width + j] = (unsigned char)(colour > 255 ? 255 : colour);
         }
     }
-    fclose(out);
+
+    save_png(filename, data, width, height);
+    free(data);
 }
 
 int main(int argc, char **argv)
 {
     int width = 600, height = 600;
     int maxIterations = 500;
-    double step = 1;
+    int samplesPerPixel = 1;
+    double step;
     int a, b;
     double x, y;
     int x1, y1;
@@ -83,14 +86,16 @@ int main(int argc, char **argv)
     complex *history;
     time_t start;
     double seconds;
+    char filename[100];
 
     if (argc > 1)
         width = height = atoi(argv[1]);
     if (argc > 2)
         maxIterations = atoi(argv[2]);
     if (argc > 3)
-        step =  1.0 / sqrt(atoi(argv[3]));
+        samplesPerPixel = atoi(argv[3]);
 
+    step =  1.0 / sqrt(samplesPerPixel);
     bufferSize = sizeof(int) * width * height;
     counters = malloc(bufferSize);
     memset(counters, 0, bufferSize);
@@ -134,7 +139,8 @@ int main(int argc, char **argv)
     seconds = difftime(time(NULL), start);
     printf("\nProcessing completed in %.0fs\nSaving raw\n", seconds);
 
-    save(counters, width, height);
+    sprintf(filename, "out_%d_%d_%d.png", width, maxIterations, samplesPerPixel); 
+    save(counters, width, height, filename);
 
     free(counters);
     free(history);
