@@ -42,7 +42,7 @@
 				Name="VCCLCompilerTool"
 				AdditionalOptions="/Za"
 				Optimization="0"
-				AdditionalIncludeDirectories=""
+				AdditionalIncludeDirectories="..\lib"
 				PreprocessorDefinitions="WIN32;_DEBUG;_CONSOLE"
 				MinimalRebuild="true"
 				ExceptionHandling="0"
@@ -66,6 +66,7 @@
 				Name="VCLinkerTool"
 				AdditionalDependencies="libpng.lib zlib.lib"
 				LinkIncremental="2"
+				AdditionalLibraryDirectories="..\lib\win32"
 				GenerateDebugInformation="true"
 				SubSystem="1"
 				TargetMachine="1"
@@ -120,7 +121,7 @@
 				AdditionalOptions="/Za"
 				Optimization="2"
 				EnableIntrinsicFunctions="true"
-				AdditionalIncludeDirectories=""
+				AdditionalIncludeDirectories="..\lib"
 				PreprocessorDefinitions="WIN32;NDEBUG;_CONSOLE"
 				ExceptionHandling="0"
 				RuntimeLibrary="2"
@@ -143,6 +144,7 @@
 				Name="VCLinkerTool"
 				AdditionalDependencies="libpng.lib zlib.lib"
 				LinkIncremental="1"
+				AdditionalLibraryDirectories="..\lib\win32"
 				GenerateDebugInformation="true"
 				SubSystem="1"
 				OptimizeReferences="2"
@@ -177,10 +179,6 @@
 	<Files>
 		<File
 			RelativePath=".\buddhabread.c"
-			>
-		</File>
-		<File
-			RelativePath=".\png.h"
 			>
 		</File>
 		<File
