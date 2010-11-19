@@ -48,6 +48,8 @@ void save(unsigned int *counters, int width, int height, char *filename)
     unsigned int maxCount = 0;
     unsigned char *data;
 
+    printf("\nProcessing results\n");
+
     for (i = 0; i < width * height; i ++)
     {
         total += counters[i];
@@ -55,7 +57,7 @@ void save(unsigned int *counters, int width, int height, char *filename)
     }
     luminosity = (double)total / (width * height);
 
-    printf("\nTotal: %d\nMax  : %d\nLumin: %f\n", total, maxCount, luminosity);
+    printf("\nTotal points: %d\nMaximum     : %d\nAverage lum : %f\n", total, maxCount, luminosity);
 
     data = malloc(width * height);
     for (i = 0; i < height; i ++)
@@ -67,6 +69,7 @@ void save(unsigned int *counters, int width, int height, char *filename)
         }
     }
 
+    printf("\nSaving to %s\n", filename);
     save_png(filename, data, width, height);
     free(data);
 }
@@ -104,6 +107,7 @@ int main(int argc, char **argv)
 
     start = time(NULL);
 
+    printf("Mediating");
     for (x = 0; x < width; x += step)
     {
         printf(".");
@@ -137,9 +141,9 @@ int main(int argc, char **argv)
     }
 
     seconds = difftime(time(NULL), start);
-    printf("\nProcessing completed in %.0fs\nSaving raw\n", seconds);
+    printf("\nCalculations completed in %.0fs\n", seconds);
 
-    sprintf(filename, "out_%d_%d_%d.png", width, maxIterations, samplesPerPixel); 
+    sprintf(filename, "out_%d_%d_%d.png", width, maxIterations, samplesPerPixel); /* TODO: Potential buffer overflow */
     save(counters, width, height, filename);
 
     free(counters);
