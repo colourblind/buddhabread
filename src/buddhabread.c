@@ -112,8 +112,6 @@ int main(int argc, char **argv)
             c.im = (y * 3.0 / height - 1.5);
             z.im = z.re = 0;
 
-            memset(history, 0, sizeof(complex) * maxIterations);
-
             a = 0;
             while (a < maxIterations)
             {
