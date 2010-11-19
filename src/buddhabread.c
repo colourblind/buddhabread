@@ -34,11 +34,6 @@ complex add(complex a, complex b)
     return result;
 }
 
-double length(complex a)
-{
-    return sqrt(a.re * a.re + a.im * a.im);
-}
-
 void save(unsigned int *counters, int width, int height, char *filename)
 {
     int i, j;
@@ -124,7 +119,7 @@ int main(int argc, char **argv)
             {
                 z = add(mult(z, z), c);
                 history[a] = z;
-                if (length(z) > 2.1)
+                if ((z.re * z.re + z.im * z.im) > 4.05)
                 {
                     for (b = 1; b <= a; b ++)
                     {
