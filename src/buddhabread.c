@@ -77,6 +77,7 @@ int main(int argc, char **argv)
     double step;
     int a, b;
     double x, y;
+    double p;
     int x1, y1;
     unsigned int bufferSize;
     unsigned int *counters;
@@ -111,6 +112,10 @@ int main(int argc, char **argv)
             c.re = (x * 3.0 / width - 2);
             c.im = (y * 3.0 / height - 1.5);
             z.im = z.re = 0;
+
+            p = sqrt((c.re - 0.25) * (c.re - 0.25) + (c.im * c.im));
+            if (p - 2 * p * p + 0.25 > c.re)
+                continue;
 
             a = 0;
             while (a < maxIterations)
