@@ -10,7 +10,7 @@
 #include <math.h>
 #include <time.h>
 
-int save_png(char *filename, char *data, int width, int height);
+int save_png(char *filename, unsigned char *data, int width, int height);
 
 typedef struct complex
 {
@@ -59,6 +59,7 @@ void save(unsigned int *counters, int width, int height, char *filename)
     {
         for (j = 0; j < width; j ++)
         {
+//            colour = ((double)counters[j * width + i] / maxCount * 10) * 255.0;
             colour = (counters[j * width + i] / (luminosity * 10)) * 255.0;
             data[i * width + j] = (unsigned char)(colour > 255 ? 255 : colour);
         }
@@ -71,10 +72,9 @@ void save(unsigned int *counters, int width, int height, char *filename)
 
 int main(int argc, char **argv)
 {
-    int width = 600, height = 600;
+    int size = 600;
     int maxIterations = 500;
-    int samplesPerPixel = 1;
-    double step;
+    int samples = 600;
     int a, b;
     double x, y;
     double p;
@@ -88,14 +88,13 @@ int main(int argc, char **argv)
     char filename[100];
 
     if (argc > 1)
-        width = height = atoi(argv[1]);
+        size = atoi(argv[1]);
     if (argc > 2)
         maxIterations = atoi(argv[2]);
     if (argc > 3)
-        samplesPerPixel = atoi(argv[3]);
+        samples = atoi(argv[3]);
 
-    step =  1.0 / sqrt(samplesPerPixel);
-    bufferSize = sizeof(int) * width * height;
+    bufferSize = sizeof(int) * size * size;
     counters = malloc(bufferSize);
     memset(counters, 0, bufferSize);
 
@@ -104,15 +103,16 @@ int main(int argc, char **argv)
     start = time(NULL);
 
     printf("Mediating");
-    for (x = 0; x < width; x += step)
+    for (x = 0; x < samples; x ++)
     {
         printf(".");
-        for (y = 0; y < height; y += step)
+        for (y = 0; y < samples; y ++)
         {
-            c.re = (x * 3.0 / width - 2);
-            c.im = (y * 3.0 / height - 1.5);
+            c.re = (x * 3.0 / samples - 2);
+            c.im = (y * 3.0 / samples - 1.5);
             z.im = z.re = 0;
 
+            /* Discard values of c within the main cardioid */
             p = sqrt((c.re - 0.25) * (c.re - 0.25) + (c.im * c.im));
             if (p - 2 * p * p + 0.25 > c.re)
                 continue;
@@ -126,10 +126,10 @@ int main(int argc, char **argv)
                 {
                     for (b = 1; b <= a; b ++)
                     {
-                        x1 = (int)((history[b].re + 2) * width / 3);
-                        y1 = (int)((history[b].im + 1.5) * height / 3);
-                        if (x1 >= 0 && x1 < width && y1 >= 0 && y1 < height)
-                            counters[x1 * width + y1] ++;
+                        x1 = (int)(((double)history[b].re + 2) / 3.0 * (double)size);
+                        y1 = (int)(((double)history[b].im + 1.5) / 3.0 * (double)size);
+                        if (x1 >= 0 && x1 < size && y1 >= 0 && y1 < size)
+                            counters[x1 * size + y1] ++;
                     }
                     break;
                 }
@@ -141,8 +141,8 @@ int main(int argc, char **argv)
     seconds = difftime(time(NULL), start);
     printf("\nCalculations completed in %.0fs\n", seconds);
 
-    sprintf(filename, "out_%d_%d_%d.png", width, maxIterations, samplesPerPixel); /* TODO: Potential buffer overflow */
-    save(counters, width, height, filename);
+    sprintf(filename, "out_%d_%d_%d.png", size, maxIterations, samples); /* TODO: Potential buffer overflow */
+    save(counters, size, size, filename);
 
     free(counters);
     free(history);
