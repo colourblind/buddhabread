@@ -34,7 +34,7 @@ complex add(complex a, complex b)
     return result;
 }
 
-void save(unsigned int *counters, int width, int height, char *filename)
+void save(unsigned int *counters, int width, int height, char *filename, int verbose)
 {
     int i, j;
     double colour;
@@ -43,7 +43,8 @@ void save(unsigned int *counters, int width, int height, char *filename)
     unsigned int maxCount = 0;
     unsigned char *data;
 
-    printf("\nProcessing results\n");
+    if (verbose)
+        printf("\nProcessing results\n");
 
     for (i = 0; i < width * height; i ++)
     {
@@ -52,20 +53,21 @@ void save(unsigned int *counters, int width, int height, char *filename)
     }
     luminosity = (double)total / (width * height);
 
-    printf("\nTotal points: %d\nMaximum     : %d\nAverage lum : %f\n", total, maxCount, luminosity);
+    if (verbose)
+        printf("\nTotal points: %d\nMaximum     : %d\nAverage lum : %f\n", total, maxCount, luminosity);
 
     data = malloc(width * height);
     for (i = 0; i < height; i ++)
     {
         for (j = 0; j < width; j ++)
         {
-//            colour = ((double)counters[j * width + i] / maxCount * 10) * 255.0;
-            colour = (counters[j * width + i] / (luminosity * 10)) * 255.0;
+            colour = ((double)counters[j * width + i] / (luminosity * 10)) * 255.0;
             data[i * width + j] = (unsigned char)(colour > 255 ? 255 : colour);
         }
     }
 
-    printf("\nSaving to %s\n", filename);
+    if (verbose)
+        printf("\nSaving to %s\n", filename);
     save_png(filename, data, width, height);
     free(data);
 }
@@ -108,6 +110,7 @@ int main(int argc, char **argv)
         printf(".");
         for (y = 0; y < samples; y ++)
         {
+            /* Map to the complex plane in the desired range */
             c.re = (x * 3.0 / samples - 2);
             c.im = (y * 3.0 / samples - 1.5);
             z.im = z.re = 0;
@@ -122,7 +125,7 @@ int main(int argc, char **argv)
             {
                 z = add(mult(z, z), c);
                 history[a] = z;
-                if ((z.re * z.re + z.im * z.im) > 4.05)
+                if ((z.re * z.re + z.im * z.im) > 4.05) /* Escapee! */
                 {
                     for (b = 1; b <= a; b ++)
                     {
@@ -141,8 +144,8 @@ int main(int argc, char **argv)
     seconds = difftime(time(NULL), start);
     printf("\nCalculations completed in %.0fs\n", seconds);
 
-    sprintf(filename, "out_%d_%d_%d.png", size, maxIterations, samples); /* TODO: Potential buffer overflow */
-    save(counters, size, size, filename);
+    _snprintf(filename, 100, "out_%d_%d_%d.png", size, maxIterations, samples);
+    save(counters, size, size, filename, 1);
 
     free(counters);
     free(history);
