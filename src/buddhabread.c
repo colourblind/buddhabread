@@ -108,6 +108,8 @@ int main(int argc, char **argv)
     for (x = 0; x < samples; x ++)
     {
         printf(".");
+        if ((int)x % (int)((double)samples / 50) == 0)
+            printf("%d%%", (int)(x * 100 / samples));
         for (y = 0; y < samples; y ++)
         {
             /* Map to the complex plane in the desired range */
